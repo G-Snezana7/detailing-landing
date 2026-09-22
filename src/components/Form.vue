@@ -13,25 +13,22 @@ const emit = defineEmits(['close'])
 const name = ref('')
 const phone = ref('')
 const isSending = ref(false)
+const isSuccess = ref(false) // Отслеживаем успешную отправку
 
-// КЛЮЧ WEB3FORMS 
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY
 
-// Добавляем аргумент force. По умолчанию он false.
-const handleClose = (force = false) => {
-  // Не закрываем по клику на крестик/фон, пока идет отправка. 
-  // Но если force === true (после успеха), то закрываем в любом случае!
-  if (isSending.value && !force) return
+const handleClose = () => {
+  if (isSending.value) return
 
   name.value = ''
   phone.value = ''
+  isSuccess.value = false
   emit('close')
 }
 
 const handleSubmit = async () => {
   if (!name.value || !phone.value) return
 
-  // Валидация номера телефона (минимум 9 цифр)
   const digitsOnly = phone.value.replace(/\D/g, '')
   if (digitsOnly.length < 9) {
     alert('Please enter a valid phone number!')
@@ -46,7 +43,6 @@ const handleSubmit = async () => {
   formData.append('name', name.value)
   formData.append('phone', phone.value)
 
-  // ИСПРАВЛЕНО: Объявляем адрес, который был потерян
   const finalUrl = 'https://web3forms.com'
 
   try {
@@ -58,10 +54,13 @@ const handleSubmit = async () => {
     const result = await response.json()
 
     if (result.success) {
-      // ИСПРАВЛЕНО: Передаем true, чтобы принудительно закрыть окно
-      handleClose(true)
+      // Прячем форму и показываем сообщение об успехе
+      isSuccess.value = true
 
-      alert('Thank you! Your request has been successfully sent.')
+      // Автоматически закрываем модалку через 3 секунды
+      setTimeout(() => {
+        handleClose()
+      }, 3000)
     } else {
       alert(`Server error: ${result.message || 'Something went wrong'}`)
     }
@@ -73,6 +72,49 @@ const handleSubmit = async () => {
   }
 }
 </script>
+
+<template>
+  <Transition name="fade">
+    <div v-if="isOpen" class="modal-overlay" @click.self="handleClose">
+      <div class="modal-content" role="dialog" aria-modal="true">
+
+        <button class="modal-close" @click="handleClose" :disabled="isSending" aria-label="Close modal window">
+          &times;
+        </button>
+
+        <!-- БЛОК 1: Показыаем саму форму, если отправка еще НЕ произошла -->
+        <div v-if="!isSuccess">
+          <h3 class="modal-title">Request a Details</h3>
+          <p class="modal-subtitle">Leave your contact details and we will call you back</p>
+
+          <form @submit.prevent="handleSubmit" class="modal-form">
+            <div class="form-group">
+              <input v-model.trim="name" type="text" placeholder="Your name" required class="form-input"
+                aria-label="Full Name" :disabled="isSending" />
+            </div>
+
+            <div class="form-group">
+              <input v-model.trim="phone" type="tel" placeholder="+375 (__) ___-__-__" required class="form-input"
+                aria-label="Phone number" :disabled="isSending" />
+            </div>
+
+            <button type="submit" :disabled="isSending" class="form-submit-btn">
+              {{ isSending ? 'Sending...' : 'Submit Request' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- БЛОК 2: Стильное сообщение об успехе вместо некрасивого alert() -->
+        <div v-else class="modal-success-message">
+          <div class="success-icon">✓</div>
+          <h3 class="modal-title">Thank you!</h3>
+          <p class="modal-subtitle">Your request has been successfully sent. We will call you back shortly.</p>
+        </div>
+
+      </div>
+    </div>
+  </Transition>
+</template>
 
 <style lang="scss" scoped>
 .modal-overlay {
@@ -97,6 +139,7 @@ const handleSubmit = async () => {
   max-width: 450px;
   width: 90%;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
 }
 
 .modal-close {
@@ -108,10 +151,23 @@ const handleSubmit = async () => {
   color: #888;
   font-size: 28px;
   cursor: pointer;
+  transition: color 0.2s;
 
   &:hover {
     color: #fff;
   }
+}
+
+.modal-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
 }
 
 .form-input {
@@ -146,26 +202,46 @@ const handleSubmit = async () => {
   }
 }
 
-/* Классы анимации Vue Transition */
+/* Анимация успеха */
+.modal-success-message {
+  padding: 20px 0;
+  animation: fadeIn 0.3s ease;
+}
 
-// Эффект плавного появления и исчезновения для всего фона
+.success-icon {
+  font-size: 48px;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Классы для плавной анимации всей модалки Vue Transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
 
-  // Дополнительно анимируем само белое окошко, чтобы оно слегка увеличивалось при появлении
   .modal-content {
     transition: transform 0.3s ease;
   }
 }
 
-// Начальное состояние при появлении и конечное при исчезновении
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 
   .modal-content {
-    transform: scale(0.9); // Окошко плавно увеличивается с 90% до 100%
+    transform: scale(0.9);
   }
 }
 </style>
