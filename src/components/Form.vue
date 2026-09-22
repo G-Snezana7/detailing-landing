@@ -47,7 +47,7 @@ const handleSubmit = async () => {
 
 
   try {
-    const response = await fetch('https://api.web3forms.com/submit', {
+    const response = await fetch(finalUrl, {
       method: 'POST',
       body: formData
     })
@@ -56,6 +56,7 @@ const handleSubmit = async () => {
 
     if (result.success) {
       alert('Thank you! Your request has been successfully sent.')
+      // 1. ОБЯЗАТЕЛЬНО ВЫЗЫВАЕМ ЗАКРЫТИЕ И ОЧИСТКУ ПОЛЕЙ:
       handleClose()
     } else {
       alert(`Server error: ${result.message || 'Something went wrong'}`)
@@ -64,9 +65,10 @@ const handleSubmit = async () => {
     console.error('Ошибка при отправке:', error)
     alert('An error occurred. Please check your network connection.')
   } finally {
+    // 2. ВОЗВРАЩАЕМ КНОПКЕ АКТИВНОЕ СОСТОЯНИЕ (Sending... меняется обратно):
     isSending.value = false
   }
-}
+
 </script>
 
 <template>
