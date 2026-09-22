@@ -50,32 +50,35 @@ const handleSubmit = async () => {
       body: formData
     })
 
-    // Если сервер ответил успешно (Статус 200, который мы видели в Сети)
     if (response.ok) {
-      // 1. МГНОВЕННО переключаем окно на экран успеха "Thank you!"
+      // 1. МГНОВЕННО ОЧИЩАЕМ ПОЛЯ, чтобы пользователь не мог отправить дубль!
+      name.value = ''
+      phone.value = ''
+
+      // 2. Включаем экран успеха
       isSuccess.value = true
 
-      // 2. Ровно через 3 секунды плавно закрываем всю модалку
+      // 3. Закрываем всю модалку через 3 секунды
       setTimeout(() => {
-        handleClose()
+        emit('close') // Шлем прямой сигнал закрытия в App.vue
+        isSuccess.value = false // Сбрасываем статус успеха для следующего открытия
       }, 3000)
+
     } else {
-      // Если статус не 200, пробуем прочитать ошибку
       const result = await response.json()
       alert(`Server error: ${result.message || 'Something went wrong'}`)
     }
 
   } catch (error) {
     console.error('Ошибка при отправке:', error)
-    // РЕЗЕРВНЫЙ ВАРИАНТ: Если письмо пришло, но JS споткнулся на обработке, 
-    // мы ВСЁ РАВНО принудительно закроем форму, чтобы интерфейс не вис у пользователя!
-    isSuccess.value = true
-    setTimeout(() => {
-      handleClose()
-    }, 3000)
+    // Если произошла ошибка сети, но мы хотим очистить поля:
+    name.value = ''
+    phone.value = ''
+    emit('close')
   } finally {
     isSending.value = false
   }
+
 
 }
 </script>
