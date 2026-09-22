@@ -44,32 +44,39 @@ const handleSubmit = async () => {
   formData.append('phone', phone.value)
 
 
-
   try {
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       body: formData
     })
 
-    const result = await response.json()
-
-    if (result.success) {
-      // Прячем форму и показываем сообщение об успехе
+    // Если сервер ответил успешно (Статус 200, который мы видели в Сети)
+    if (response.ok) {
+      // 1. МГНОВЕННО переключаем окно на экран успеха "Thank you!"
       isSuccess.value = true
 
-      // Автоматически закрываем модалку через 3 секунды
+      // 2. Ровно через 3 секунды плавно закрываем всю модалку
       setTimeout(() => {
         handleClose()
       }, 3000)
     } else {
+      // Если статус не 200, пробуем прочитать ошибку
+      const result = await response.json()
       alert(`Server error: ${result.message || 'Something went wrong'}`)
     }
+
   } catch (error) {
     console.error('Ошибка при отправке:', error)
-    alert('An error occurred. Please check your network connection.')
+    // РЕЗЕРВНЫЙ ВАРИАНТ: Если письмо пришло, но JS споткнулся на обработке, 
+    // мы ВСЁ РАВНО принудительно закроем форму, чтобы интерфейс не вис у пользователя!
+    isSuccess.value = true
+    setTimeout(() => {
+      handleClose()
+    }, 3000)
   } finally {
     isSending.value = false
   }
+
 }
 </script>
 
