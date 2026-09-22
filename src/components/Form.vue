@@ -43,10 +43,10 @@ const handleSubmit = async () => {
   formData.append('name', name.value)
   formData.append('phone', phone.value)
 
-  const finalUrl = 'https://web3forms.com'
+
 
   try {
-    const response = await fetch(finalUrl, {
+    const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       body: formData
     })
