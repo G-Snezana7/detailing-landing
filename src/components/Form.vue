@@ -18,12 +18,11 @@ const isSending = ref(false)
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY
 
 const handleClose = () => {
-  // Запрещаем закрывать окно, если сейчас идет отправка данных на сервер
-  if (isSending.value) return
+  if (isSending.value) return // Не закрываем, пока идет отправка
 
-  name.value = ''
-  phone.value = ''
-  emit('close')
+  name.value = '' // Очищаем поле имени
+  phone.value = '' // Очищаем поле телефона
+  emit('close') // Отправляем сигнал "close" в App.vue, чтобы скрыть v-if
 }
 
 const handleSubmit = async () => {
