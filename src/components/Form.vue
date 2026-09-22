@@ -17,18 +17,21 @@ const isSending = ref(false)
 // КЛЮЧ WEB3FORMS 
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY
 
-const handleClose = () => {
-  if (isSending.value) return // Не закрываем, пока идет отправка
+// Добавляем аргумент force. По умолчанию он false.
+const handleClose = (force = false) => {
+  // Не закрываем по клику на крестик/фон, пока идет отправка. 
+  // Но если force === true (после успеха), то закрываем в любом случае!
+  if (isSending.value && !force) return
 
-  name.value = '' // Очищаем поле имени
-  phone.value = '' // Очищаем поле телефона
-  emit('close') // Отправляем сигнал "close" в App.vue, чтобы скрыть v-if
+  name.value = ''
+  phone.value = ''
+  emit('close')
 }
 
 const handleSubmit = async () => {
   if (!name.value || !phone.value) return
 
-  // Коммерческая валидация: проверяем, что введено хотя бы 9 цифр (длина кода + номера в РБ)
+  // Валидация номера телефона (минимум 9 цифр)
   const digitsOnly = phone.value.replace(/\D/g, '')
   if (digitsOnly.length < 9) {
     alert('Please enter a valid phone number!')
@@ -43,7 +46,8 @@ const handleSubmit = async () => {
   formData.append('name', name.value)
   formData.append('phone', phone.value)
 
-
+  // ИСПРАВЛЕНО: Объявляем адрес, который был потерян
+  const finalUrl = 'https://web3forms.com'
 
   try {
     const response = await fetch(finalUrl, {
@@ -54,10 +58,9 @@ const handleSubmit = async () => {
     const result = await response.json()
 
     if (result.success) {
-      // 1. СНАЧАЛА полностью закрываем окно и очищаем инпуты
-      handleClose()
+      // ИСПРАВЛЕНО: Передаем true, чтобы принудительно закрыть окно
+      handleClose(true)
 
-      // 2. И ТОЛЬКО ПОТОМ показываем уведомление пользователю
       alert('Thank you! Your request has been successfully sent.')
     } else {
       alert(`Server error: ${result.message || 'Something went wrong'}`)
@@ -68,44 +71,9 @@ const handleSubmit = async () => {
   } finally {
     isSending.value = false
   }
-
-
+}
 </script>
 
-<template>
-  <Transition name="fade">
-    <div v-if="isOpen" class="modal-overlay" @click.self="handleClose">
-      <!-- Добавляем роль диалогового окна для доступности (A11y) -->
-      <div class="modal-content" role="dialog" aria-modal="true">
-
-        <!-- Кнопка закрытия теперь доступна для скринридеров и блокируется при отправке -->
-        <button class="modal-close" @click="handleClose" :disabled="isSending" aria-label="Close modal window">
-          &times;
-        </button>
-
-        <h3 class="modal-title">Request a Details</h3>
-        <p class="modal-subtitle">Leave your contact details and we will call you back</p>
-
-        <form @submit.prevent="handleSubmit" class="modal-form">
-          <div class="form-group">
-            <!-- aria-label заменяет скрытый тег <label> и делает код доступным -->
-            <input v-model.trim="name" type="text" placeholder="Your name" required class="form-input"
-              aria-label="Full Name" :disabled="isSending" />
-          </div>
-
-          <div class="form-group">
-            <input v-model.trim="phone" type="tel" placeholder="+375 (__) ___-__-__" required class="form-input"
-              aria-label="Phone number" :disabled="isSending" />
-          </div>
-
-          <button type="submit" :disabled="isSending" class="form-submit-btn">
-            {{ isSending ? 'Sending...' : 'Submit Request' }}
-          </button>
-        </form>
-      </div>
-    </div>
-  </Transition>
-</template>
 <style lang="scss" scoped>
 .modal-overlay {
   position: fixed;
