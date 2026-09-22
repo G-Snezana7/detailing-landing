@@ -1,0 +1,14 @@
+// Шрифты
+$font-title: 'Clash Display', sans-serif;
+$font-body: 'Inter', sans-serif;
+
+// Цвета (Luxury Car Detailing)
+$color-bg: #000000;         // Основной черный фон
+$color-primary: #FFFFFF;    // Главный белый цвет (для заголовков и шапки)
+$color-text-hero-sub: #E1E1E1; // Светло-серый для подзаголовка
+$color-text-light-grey: #CCCCCC; // Средний серый для параграфов
+$color-text-muted: #999999;    // Темно-серый для сабтайтлов и футера
+
+// Миксины для адаптивности
+@mixin tablet { @media (max-width: 768px) { @content; } }
+@mixin mobile { @media (max-width: 480px) { @content; } }
