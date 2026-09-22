@@ -6,7 +6,7 @@ This project demonstrates production-ready frontend architecture, strict adheren
 
 ### 🚀 Live Demo
 
-**[👉 Click here to view the live website](https://https://detailing-landing.netlify.app/)** 
+**[👉 Click here to view the live website](https://detailing-landing.netlify.app/)** 
 
 ### 📊 Google Lighthouse Metrics
 
