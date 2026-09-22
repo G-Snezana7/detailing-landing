@@ -54,9 +54,11 @@ const handleSubmit = async () => {
     const result = await response.json()
 
     if (result.success) {
-      alert('Thank you! Your request has been successfully sent.')
-      // 1. ОБЯЗАТЕЛЬНО ВЫЗЫВАЕМ ЗАКРЫТИЕ И ОЧИСТКУ ПОЛЕЙ:
+      // 1. СНАЧАЛА полностью закрываем окно и очищаем инпуты
       handleClose()
+
+      // 2. И ТОЛЬКО ПОТОМ показываем уведомление пользователю
+      alert('Thank you! Your request has been successfully sent.')
     } else {
       alert(`Server error: ${result.message || 'Something went wrong'}`)
     }
@@ -64,9 +66,9 @@ const handleSubmit = async () => {
     console.error('Ошибка при отправке:', error)
     alert('An error occurred. Please check your network connection.')
   } finally {
-    // 2. ВОЗВРАЩАЕМ КНОПКЕ АКТИВНОЕ СОСТОЯНИЕ (Sending... меняется обратно):
     isSending.value = false
   }
+
 
 </script>
 
