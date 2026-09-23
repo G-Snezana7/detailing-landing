@@ -1,6 +1,5 @@
 @use './variables' as *; 
 
-/* Подключаем локальный Clash Display Regular (400) */
 @font-face {
   font-family: 'Clash Display';
   src: url('../fonts/ClashDisplay-Regular.woff2') format('woff2');
@@ -9,7 +8,6 @@
   font-display: swap; /* Позволяет тексту отобразиться сразу, не дожидаясь загрузки файла */
 }
 
-/* Подключаем локальный Clash Display Medium (500) */
 @font-face {
   font-family: 'Clash Display';
   src: url('../fonts/ClashDisplay-Medium.woff2') format('woff2');
@@ -18,7 +16,6 @@
   font-display: swap;
 }
 
-/* Подключаем локальный Inter Regular (400) */
 @font-face {
   font-family: 'Inter';
   src: url('../fonts/Inter-Regular.woff2') format('woff2');
@@ -27,7 +24,6 @@
   font-display: swap;
 }
 
-/* Подключаем локальный Inter Medium (500) */
 @font-face {
   font-family: 'Inter';
   src: url('../fonts/Inter-Medium.woff2') format('woff2');
@@ -62,9 +58,9 @@ ul {
 .container {
   max-width: 1120px;
   width: 100%;
-  margin-right: auto; /* Жесткое центрирование */
-  margin-left: auto;  /* Жесткое центрирование */
-  padding: 0 1.25rem; /* Защитные отступы по краям (20px) */
+  margin-right: auto; 
+  margin-left: auto;  
+  padding: 0 1.25rem; 
 }
 
 // Служебный класс доступности 

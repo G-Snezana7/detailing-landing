@@ -212,7 +212,6 @@ const legalLinks = [
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    /* 24px зазор по макету */
     list-style: none;
     padding: 0;
     margin: 0;
@@ -269,7 +268,6 @@ const legalLinks = [
 
     @include tablet {
       flex-direction: column-reverse;
-      /* Копирайт встанет в самый низ */
       gap: 1.5rem;
       text-align: center;
     }
